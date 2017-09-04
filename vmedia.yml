@@ -1,0 +1,33 @@
+---
+# This role contains task for configuring vmedia properties
+- hosts: localhost
+  connection: local
+  gather_facts: no
+  tasks:
+   - name: enable vmedia
+     cisco_imc_vmedia:
+       state: "{{state}}"
+       encryption_state: "{{encryption_state}}"
+       low_power_usb: "{{low_power_usb}}"
+       starship_options: "{{starship_options}}"
+     register: vmedia_output
+    
+   - set_stats:
+       data:
+         Result: {Message: "{{vmedia_output['msg']}}", State: "{{vmedia_output['status']}}", Type: "config"}
+
+   - name: create vmedia mapping
+     cisco_imc_vmedia_mapping:
+       state: "{{state}}"
+       volume_name: "{{volume_name}}"
+       remote_share: "{{remote_share}}"
+       remote_file: "{{remote_file}}"
+       map: "{{map}}"
+       mount_options: "{{mount_options}}"
+       username: "{{username}}"
+       password: "{{password}}"
+     register: vmedia_mapped_output
+
+   - set_stats:
+       data:
+         Result: {Message: "{{vmedia_mapped_output['msg']}}", State: "{{vmedia_mapped_output['status']}}", Type: "config"} 
